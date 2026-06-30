@@ -9,8 +9,6 @@
   --border: #e2e6ec;
   --text: #1a1d23;
   --muted: #6b7280;
-  --line-num-bg: #eef0f4;
-  --line-num-text: #9ca3af;
   --highlight: #fef08a;
   --shadow: 0 -4px 24px rgba(0, 0, 0, 0.12);
   --radius: 14px;
@@ -87,31 +85,6 @@ body {
   height: calc(100dvh - 64px - env(safe-area-inset-top));
   overflow: hidden;
   background: var(--surface);
-}
-
-/* 行號欄（預設隱藏，由 JS 切換 .visible） */
-.line-numbers {
-  display: none;
-  flex-shrink: 0;
-  width: 44px;
-  padding: 16px 6px 16px 10px;
-  background: var(--line-num-bg);
-  color: var(--line-num-text);
-  font-family: var(--font-editor);
-  font-size: 0.8rem;
-  line-height: 1.6;
-  text-align: right;
-  overflow: hidden;
-  user-select: none;
-  border-right: 1px solid var(--border);
-}
-
-.line-numbers.visible {
-  display: block;
-}
-
-.line-numbers .line-num {
-  height: 1.6em;
 }
 
 .editor-wrapper {

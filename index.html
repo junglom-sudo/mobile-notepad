@@ -14,12 +14,11 @@
   <header class="toolbar">
     <button type="button" id="btn-file" class="menu-btn" aria-haspopup="true">檔案</button>
     <button type="button" id="btn-edit" class="menu-btn" aria-haspopup="true">編輯</button>
-    <span class="doc-title" id="doc-title" title="目前檔名">未命名</span>
+    <span class="doc-title" id="doc-title" title="目前虛擬檔名">未命名文件</span>
   </header>
 
-  <!-- 主編輯區：左側行號 + 右側文字輸入 -->
+  <!-- 主編輯區 -->
   <main class="editor-container">
-    <div class="line-numbers" id="line-numbers" aria-hidden="true"></div>
     <div class="editor-wrapper">
       <div
         id="editor"
@@ -51,9 +50,7 @@
       <button type="button" class="sheet-item" data-action="open">📂 開啟檔案</button>
       <button type="button" class="sheet-item" data-action="save">💾 儲存檔案</button>
       <button type="button" class="sheet-item" data-action="save-as">💾 另存新檔</button>
-      <button type="button" class="sheet-item" data-action="toggle-lines">
-        <span id="line-toggle-label">顯示行號</span>
-      </button>
+      <button type="button" class="sheet-item" data-action="copy-all">📋 一鍵複製全文</button>
       <button type="button" class="sheet-item sheet-cancel" data-close-sheet>取消</button>
     </nav>
   </div>
