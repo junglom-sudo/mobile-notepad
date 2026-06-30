@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <!-- 手機瀏覽器視窗設定：禁止縮放以獲得類 App 體驗 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>手機記事本</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 頂部工具列：檔案與編輯大選單 -->
+  <header class="toolbar">
+    <button type="button" id="btn-file" class="menu-btn" aria-haspopup="true">檔案</button>
+    <button type="button" id="btn-edit" class="menu-btn" aria-haspopup="true">編輯</button>
+    <span class="doc-title" id="doc-title" title="目前檔名">未命名</span>
+  </header>
+
+  <!-- 主編輯區：左側行號 + 右側文字輸入 -->
+  <main class="editor-container">
+    <div class="line-numbers" id="line-numbers" aria-hidden="true"></div>
+    <div class="editor-wrapper">
+      <div
+        id="editor"
+        class="editor"
+        contenteditable="true"
+        spellcheck="false"
+        role="textbox"
+        aria-multiline="true"
+        aria-label="文字編輯區"
+      ></div>
+    </div>
+  </main>
+
+  <!-- 隱藏的檔案選擇器，用於「開啟檔案」 -->
+  <input
+    type="file"
+    id="file-input"
+    accept=".txt,.py,.html,.htm,.js,.css,.json,.md,.xml,.csv,.log"
+    hidden
+  >
+
+  <!-- ===== 檔案選單（從底部彈出） ===== -->
+  <div class="sheet-overlay" id="file-sheet" hidden>
+    <div class="sheet-backdrop" data-close-sheet></div>
+    <nav class="sheet" aria-label="檔案選單">
+      <div class="sheet-handle"></div>
+      <h2 class="sheet-title">檔案</h2>
+      <button type="button" class="sheet-item" data-action="new">📄 新建檔案</button>
+      <button type="button" class="sheet-item" data-action="open">📂 開啟檔案</button>
+      <button type="button" class="sheet-item" data-action="save">💾 儲存檔案</button>
+      <button type="button" class="sheet-item" data-action="save-as">💾 另存新檔</button>
+      <button type="button" class="sheet-item" data-action="toggle-lines">
+        <span id="line-toggle-label">顯示行號</span>
+      </button>
+      <button type="button" class="sheet-item sheet-cancel" data-close-sheet>取消</button>
+    </nav>
+  </div>
+
+  <!-- ===== 編輯選單（從底部彈出） ===== -->
+  <div class="sheet-overlay" id="edit-sheet" hidden>
+    <div class="sheet-backdrop" data-close-sheet></div>
+    <nav class="sheet" aria-label="編輯選單">
+      <div class="sheet-handle"></div>
+      <h2 class="sheet-title">編輯</h2>
+
+      <p class="sheet-section">復原 / 重做</p>
+      <div class="sheet-row">
+        <button type="button" class="sheet-item half" data-action="undo">↩ 復原</button>
+        <button type="button" class="sheet-item half" data-action="redo">↪ 重做</button>
+      </div>
+
+      <p class="sheet-section">剪貼簿</p>
+      <div class="sheet-row">
+        <button type="button" class="sheet-item half" data-action="select-all">全選</button>
+        <button type="button" class="sheet-item half" data-action="copy">複製</button>
+      </div>
+      <div class="sheet-row">
+        <button type="button" class="sheet-item half" data-action="paste">貼上</button>
+        <button type="button" class="sheet-item half" data-action="delete">刪除</button>
+      </div>
+
+      <p class="sheet-section">尋找 / 取代</p>
+      <div class="sheet-row">
+        <button type="button" class="sheet-item half" data-action="find">🔍 尋找</button>
+        <button type="button" class="sheet-item half" data-action="replace">🔄 取代</button>
+      </div>
+
+      <p class="sheet-section">文字樣式</p>
+      <div class="sheet-row">
+        <button type="button" class="sheet-item third" data-action="bold"><b>粗體</b></button>
+        <button type="button" class="sheet-item third" data-action="italic"><i>斜體</i></button>
+        <button type="button" class="sheet-item third" data-action="underline"><u>底線</u></button>
+      </div>
+      <div class="sheet-row">
+        <button type="button" class="sheet-item half" data-action="font-smaller">A− 縮小字體</button>
+        <button type="button" class="sheet-item half" data-action="font-larger">A+ 放大字體</button>
+      </div>
+      <div class="sheet-row color-row">
+        <button type="button" class="color-btn" data-color="#000000" title="黑色" style="background:#000"></button>
+        <button type="button" class="color-btn" data-color="#e53935" title="紅色" style="background:#e53935"></button>
+        <button type="button" class="color-btn" data-color="#1e88e5" title="藍色" style="background:#1e88e5"></button>
+        <button type="button" class="color-btn" data-color="#43a047" title="綠色" style="background:#43a047"></button>
+        <button type="button" class="color-btn" data-color="#fb8c00" title="橙色" style="background:#fb8c00"></button>
+        <button type="button" class="color-btn" data-color="#8e24aa" title="紫色" style="background:#8e24aa"></button>
+      </div>
+
+      <button type="button" class="sheet-item sheet-cancel" data-close-sheet>取消</button>
+    </nav>
+  </div>
+
+  <!-- ===== 尋找對話框 ===== -->
+  <div class="modal-overlay" id="find-modal" hidden>
+    <div class="modal-backdrop" data-close-modal="find-modal"></div>
+    <div class="modal" role="dialog" aria-labelledby="find-title">
+      <h3 id="find-title">尋找</h3>
+      <input type="search" id="find-input" class="modal-input" placeholder="輸入要尋找的文字" autocomplete="off">
+      <label class="modal-check">
+        <input type="checkbox" id="find-case"> 區分大小寫
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="modal-btn" data-close-modal="find-modal">取消</button>
+        <button type="button" class="modal-btn primary" id="find-prev-btn">上一個</button>
+        <button type="button" class="modal-btn primary" id="find-next-btn">下一個</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 取代對話框 ===== -->
+  <div class="modal-overlay" id="replace-modal" hidden>
+    <div class="modal-backdrop" data-close-modal="replace-modal"></div>
+    <div class="modal" role="dialog" aria-labelledby="replace-title">
+      <h3 id="replace-title">尋找與取代</h3>
+      <input type="search" id="replace-find-input" class="modal-input" placeholder="尋找" autocomplete="off">
+      <input type="text" id="replace-with-input" class="modal-input" placeholder="取代為" autocomplete="off">
+      <label class="modal-check">
+        <input type="checkbox" id="replace-case"> 區分大小寫
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="modal-btn" data-close-modal="replace-modal">取消</button>
+        <button type="button" class="modal-btn primary" id="replace-one-btn">取代</button>
+        <button type="button" class="modal-btn primary" id="replace-all-btn">全部取代</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 另存新檔對話框 ===== -->
+  <div class="modal-overlay" id="saveas-modal" hidden>
+    <div class="modal-backdrop" data-close-modal="saveas-modal"></div>
+    <div class="modal" role="dialog" aria-labelledby="saveas-title">
+      <h3 id="saveas-title">另存新檔</h3>
+      <input type="text" id="saveas-filename" class="modal-input" placeholder="檔案名稱" autocomplete="off">
+      <label class="modal-label" for="saveas-ext">副檔名</label>
+      <select id="saveas-ext" class="modal-select">
+        <option value=".txt">.txt 純文字</option>
+        <option value=".py">.py Python</option>
+        <option value=".html">.html 網頁</option>
+        <option value=".js">.js JavaScript</option>
+        <option value=".css">.css 樣式表</option>
+        <option value=".json">.json JSON</option>
+        <option value=".md">.md Markdown</option>
+        <option value=".xml">.xml XML</option>
+      </select>
+      <div class="modal-actions">
+        <button type="button" class="modal-btn" data-close-modal="saveas-modal">取消</button>
+        <button type="button" class="modal-btn primary" id="saveas-confirm">儲存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 輕量提示訊息 -->
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
